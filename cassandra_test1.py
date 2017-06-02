@@ -29,7 +29,7 @@ else:
     session.execute(query_create_keyspace)
 session.set_keyspace(KEY_SPACE)
 
-# Queries
+# Queries for creation and drop
 query_create_table_switch = session.prepare(
     "CREATE TABLE " + SWITCH_TABLE_NAME +
     " (" + SWITCH_TABLE_ATTR1_NAME + " VARCHAR PRIMARY KEY, " +
@@ -37,6 +37,19 @@ query_create_table_switch = session.prepare(
     SWITCH_TABLE_ATTR3_NAME + " VARCHAR);")
 query_delete_table_switches = session.prepare("DROP TABLE " + SWITCH_TABLE_NAME + ";")
 
+
+# manage_table_switches():
+# Create table switches, delete if existing
+ks = keyspaces.get(KEY_SPACE)
+table = ks.tables.get(SWITCH_TABLE_NAME)
+
+if table:
+    # clear table
+    print "Table "+SWITCH_TABLE_NAME+" already exists"
+    session.execute(query_delete_table_switches)
+session.execute(query_create_table_switch)
+
+# Queries for modification
 query_insert_into_switches = session.prepare(
     "INSERT INTO " + SWITCH_TABLE_NAME + " (" + SWITCH_TABLE_ATTR1_NAME + ", " +
     SWITCH_TABLE_ATTR2_NAME + ", " +
@@ -44,17 +57,9 @@ query_insert_into_switches = session.prepare(
     "VALUES (?, ?, ?);")
 query_select_all_from_switches = session.prepare("SELECT * FROM " + SWITCH_TABLE_NAME + ";")
 
-# manage_table_switches():
-# Create table switches, delete if existing
-ks = keyspaces.get(KEY_SPACE)
-table = ks.tables.get(SWITCH_TABLE_NAME)
-if table:
-    # clear table
-    session.execute(query_delete_table_switches)
-session.execute(query_create_table_switch)
 
 # insert DATA
-session.execute(query_insert_into_switches, ('2017:db8::f102', True, 'f102_db'))
+session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
 # read out DATA
 try:
     while True:
