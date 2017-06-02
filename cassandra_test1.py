@@ -60,12 +60,16 @@ query_select_all_from_switches = session.prepare("SELECT * FROM " + SWITCH_TABLE
 
 # insert DATA
 session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
+session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
 # read out DATA
 try:
     while True:
         print(str(query_select_all_from_switches))
-        stable = session.execute(query_select_all_from_switches)
-        print stable
+        table_switches = session.execute(query_select_all_from_switches)
+        for row in table_switches:
+            print getattr(row,SWITCH_TABLE_ATTR1_NAME)
+            print getattr(row, SWITCH_TABLE_ATTR2_NAME)
+            print getattr(row, SWITCH_TABLE_ATTR3_NAME)
         print "Sleeping for 2 seconds"
         time.sleep(2)
 except KeyboardInterrupt:
