@@ -5,7 +5,7 @@ from cassandra.cluster import Cluster
 
 # constants
 KEY_SPACE = 'keyspace_sdn'
-SWITCH_TABLE_NAME = 'Switches'
+SWITCH_TABLE_NAME = 'switches'
 SWITCH_TABLE_ATTR1_NAME = 'ip_addr'
 SWITCH_TABLE_ATTR2_NAME = 'controller_ip'
 SWITCH_TABLE_ATTR3_NAME = 'table_name'
