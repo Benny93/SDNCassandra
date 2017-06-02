@@ -2,7 +2,7 @@
 import sys
 import time
 from cassandra.cluster import Cluster
-
+import util_functions
 # constants
 KEY_SPACE = 'keyspace_sdn'
 SWITCH_TABLE_NAME = 'switches'
@@ -60,18 +60,23 @@ query_select_all_from_switches = session.prepare("SELECT * FROM " + SWITCH_TABLE
 
 # insert DATA
 session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
-session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
+session.execute(query_insert_into_switches, ('2017:db8::f103', '2017:db8::f201', 'f103_db'))
 # read out DATA
 try:
     while True:
         print(str(query_select_all_from_switches))
         table_switches = session.execute(query_select_all_from_switches)
+        print util_functions.pprinttable(table_switches.current_rows)
+        """
         for row in table_switches:
-            print getattr(row,SWITCH_TABLE_ATTR1_NAME)
-            print getattr(row, SWITCH_TABLE_ATTR2_NAME)
-            print getattr(row, SWITCH_TABLE_ATTR3_NAME)
+            row_formatted = "{}:{}, {}:{}, {}:{}".format(SWITCH_TABLE_ATTR1_NAME,getattr(row,SWITCH_TABLE_ATTR1_NAME),
+                                                         SWITCH_TABLE_ATTR2_NAME, getattr(row, SWITCH_TABLE_ATTR2_NAME),
+                                                         SWITCH_TABLE_ATTR3_NAME, getattr(row, SWITCH_TABLE_ATTR3_NAME),
+                                                         )
+            print row_formatted
+        """
         print "Sleeping for 2 seconds"
         time.sleep(2)
 except KeyboardInterrupt:
     print "Warning: Caught KeyboardInterrupt"
-    sys.exit(0)
+    #sys.exit(0)
