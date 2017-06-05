@@ -11,7 +11,8 @@ SWITCH_TABLE_ATTR2_NAME = 'controller_ip'
 SWITCH_TABLE_ATTR3_NAME = 'table_name'
 
 # CONNECT TO SESSION
-cluster = Cluster(['172.17.0.3', '172.17.0.2'])
+#cluster = Cluster(['172.17.0.3', '172.17.0.2'])
+cluster = Cluster(['172.17.0.3'])
 session = cluster.connect()
 
 # Special KEYSPACE query
