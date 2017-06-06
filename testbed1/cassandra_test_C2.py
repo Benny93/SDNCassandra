@@ -73,7 +73,7 @@ try:
         """Insert random into database"""
 
         session.execute(query_insert_into_switches, (
-            "2017:db8:" + "%x" % random.randint(0, M), '2017:db8::f201', 'f103_db'))
+            "2017:db8::" + "%x" % random.randint(0, M), '2017:db8::f201', 'f103_db'))
         print util_functions.pprinttable(table_switches.current_rows)
         print "Sleeping for 2 seconds"
         time.sleep(2)
