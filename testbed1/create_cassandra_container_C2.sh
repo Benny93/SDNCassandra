@@ -3,7 +3,9 @@ TAG='latest'
 name_app1="cassandra2"
 # Ports to publish
 PUB_PORT='9042'
-CLUSTER_PARTNER_IP='172.17.0.10'
+IP='10.0.0.2'
+CLUSTER_PARTNER_IP='10.0.0.1'
+
 
 if docker ps | awk 'NR>1{  ($(NF) == '${name_app1}' )  }'; then
     docker stop "$name_app1"
@@ -12,4 +14,6 @@ if docker ps | awk 'NR>1{  ($(NF) == '${name_app1}' )  }'; then
 fi
 
 echo "Starting container "${name_app1}
-docker run --name ${name_app1} -p ${PUB_PORT} -d -e CASSANDRA_SEEDS="'$CLUSTER_PARTNER_IP'" cassandra:${TAG}
+# docker run --name ${name_app1} -p ${PUB_PORT} -d -e CASSANDRA_SEEDS="'$CLUSTER_PARTNER_IP'" cassandra:${TAG}
+#docker run --name ${name_app1}  -d -e CASSANDRA_SEEDS="'$CLUSTER_PARTNER_IP'" cassandra:${TAG}
+docker run --name ${name_app1} -d -e CASSANDRA_BROADCAST_ADDRESS=${IP} -p 7000:7000 -e CASSANDRA_SEEDS=${CLUSTER_PARTNER_IP} cassandra:${TAG}
