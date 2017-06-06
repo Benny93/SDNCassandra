@@ -6,6 +6,7 @@ PUB_PORT='9042'
 IP='10.0.0.1'
 CLUSTER_PARTNER_IP='10.0.0.2'
 
+# TODO fix this if
 if docker ps | awk 'NR>1{  ($(NF) == '${name_app1}' )  }'; then
     docker stop "$name_app1"
     docker rm -f "$name_app1"
