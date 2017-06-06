@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 TAG='latest'
 name_app1="some-cassandra"
 name_app2="some-cassandra2"
@@ -8,10 +9,12 @@ PUB_PORT='9042'
 if docker ps | awk -v name_app1="name_app1" 'NR>1{  ($(NF) == name_app1 )  }'; then
     docker stop "$name_app1"
     docker rm -f "$name_app1"
+    docker network disconnect bridge "$name_app1"
 fi
 if docker ps | awk -v name_app2="name_app2" 'NR>1{  ($(NF) == name_app2 )  }'; then
     docker stop "$name_app2"
     docker rm -f "$name_app2"
+    docker network disconnect bridge "$name_app2"
 fi
 
 echo "Starting container 1"
