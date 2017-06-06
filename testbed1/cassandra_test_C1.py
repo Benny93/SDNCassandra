@@ -44,11 +44,8 @@ query_delete_table_switches = session.prepare("DROP TABLE " + SWITCH_TABLE_NAME 
 ks = keyspaces.get(KEY_SPACE)
 table = ks.tables.get(SWITCH_TABLE_NAME)
 
-if table:
-    # clear table
-    print "Table "+SWITCH_TABLE_NAME+" already exists"
-    session.execute(query_delete_table_switches)
-session.execute(query_create_table_switch)
+if not table:
+    session.execute(query_create_table_switch)
 
 # Queries for modification
 query_insert_into_switches = session.prepare(
@@ -60,8 +57,8 @@ query_select_all_from_switches = session.prepare("SELECT * FROM " + SWITCH_TABLE
 
 
 # insert DATA
-session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
-session.execute(query_insert_into_switches, ('2017:db8::f103', '2017:db8::f201', 'f103_db'))
+# session.execute(query_insert_into_switches, ('2017:db8::f102', '2017:db8::f201', 'f102_db'))
+# session.execute(query_insert_into_switches, ('2017:db8::f103', '2017:db8::f201', 'f103_db'))
 # read out DATA
 try:
     while True:
