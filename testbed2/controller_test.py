@@ -1,5 +1,13 @@
-from ryu.base import app_manager
-app_manager.require_app('ryu.app.simple_switch_13')
-app_manager.require_app('ryu.app.gui_topology')
-import ryu.app.simple_switch_13
+import sys
+from ryu.cmd import manager
 
+# sys.argv.append('ryu.app.simple_switch_13.py')
+sys.argv.append('simple_switch_13.py')
+sys.argv.append('ws_topology.py')
+sys.argv.append('--verbose')
+sys.argv.append('--observe-links')
+# ipv6 listen host
+sys.argv.append('--ofp-listen-host')
+sys.argv.append('::')
+sys.argv.append('--enable-debugger')
+manager.main()
