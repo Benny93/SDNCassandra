@@ -1,14 +1,11 @@
-import time
-from cassandra.cluster import Cluster
-from cassandra.cqlengine.query import LWTException, QueryException
+import ast
+import json
 
-import util_functions
 from cassandra.cqlengine import columns
-from cassandra.cqlengine.models import Model
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.management import sync_table, drop_table
-from cassandra.cqlengine.management import create_keyspace_simple
-import json, ast
+from cassandra.cqlengine.models import Model
+from cassandra.cqlengine.query import LWTException, QueryException
 
 
 class MacToPortDB(Model):
