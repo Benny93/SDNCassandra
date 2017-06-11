@@ -4,6 +4,7 @@ from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 from ryu.lib.packet import ether_types
 from ryu.lib.packet import ethernet
 from ryu.lib.packet import packet
+import cassandra_vstate as cvs
 
 
 class SimpleSwitch13VState(simple_switch_13.SimpleSwitch13):
@@ -14,6 +15,7 @@ class SimpleSwitch13VState(simple_switch_13.SimpleSwitch13):
 
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch13VState, self).__init__(*args, **kwargs)
+        self.state = cvs.VState()
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
@@ -38,17 +40,20 @@ class SimpleSwitch13VState(simple_switch_13.SimpleSwitch13):
         src = eth.src
 
         dpid = datapath.id
-        self.mac_to_port.setdefault(dpid, {})
+        # Access DB
+        mac_to_port = self.state.get_dict(dpid)
 
         self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
         # learn a mac address to avoid FLOOD next time.
-        self.mac_to_port[dpid][src] = in_port
+        mac_to_port[src] = in_port
 
-        if dst in self.mac_to_port[dpid]:
-            out_port = self.mac_to_port[dpid][dst]
+        if dst in mac_to_port:
+            out_port = mac_to_port[dst]
         else:
             out_port = ofproto.OFPP_FLOOD
+        self.state.update_dict(dpid, mac_to_port)
+        # End of DB Access
 
         actions = [parser.OFPActionOutput(out_port)]
 

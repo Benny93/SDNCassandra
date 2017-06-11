@@ -11,13 +11,13 @@ from cassandra.cqlengine.query import LWTException, QueryException
 class MacToPortDB(Model):
     """
     Used to store dictionary mac_to_port
-    Example: {1234: {44: 7, 55: 6}}
+    Example: {1234: {'44': 7, '55': 6}}
 
     """
     # TODO: consider using UUID again
     # id = columns.UUID(primary_key=True)
-    dpid = columns.Integer(primary_key=True)
-    port_by_src = columns.Map(columns.Text, columns.Text)
+    dpid = columns.BigInt(primary_key=True)
+    port_by_src = columns.Map(columns.Ascii, columns.Integer)
 
 
 def drop_dict():
@@ -33,7 +33,6 @@ Abstraction of cassandra db access. Represents global network state
     """
     # class constants
     KEY_SPACE = 'keyspace_sdn'
-    TABLE_NAME = 'dict'
 
     def __init__(self):
         # CONNECT TO SESSION
@@ -48,6 +47,7 @@ Abstraction of cassandra db access. Represents global network state
     def update_dict(self, dpid, dictionary):
         """
 Saves dictionary in cassandra db
+        :param dpid:
         :param dictionary:
         """
         try:
@@ -55,7 +55,7 @@ Saves dictionary in cassandra db
             # switches = self.model.if_exists().update(**dictionary)
             # switches.save()
         except LWTException as e:
-            print e.message
+            print_info(e.message)
             pass
 
     def get_dict(self, dpid):
@@ -65,9 +65,9 @@ Returns dictionary
         # check if dict is available
         try:
             dict_res = dict(self.model.objects.get(dpid=dpid))
-            # TODO: Fix unicode problems. This is a quickfix
+            # TODO: Fix unicode problems. This is a quick fix
             return ast.literal_eval(json.dumps(dict_res['port_by_src']))
-        #            return dict_res['port_by_src']
+        # return dict_res['port_by_src']
         except QueryException as e:
             # try to create table
             try:
@@ -76,7 +76,7 @@ Returns dictionary
                 return dict_res['port_by_src']
             except LWTException as e:
                 # handle failure case
-                print e.existing  # existing object
+                print_info(e.existing)  # existing object
         # return empty
         return {}
 
@@ -84,13 +84,14 @@ Returns dictionary
 # End of class
 
 def manage_keyspace(key_space, cluster, session):
-    # Special KEYSPACE query
     """
 Set sdn namespace to current namespace. If namespace does not exist -> create
+This is still necessary because the cql engine does not handle keyspaces in the preferred way.
     :param key_space: Name of the keyspace
     :param cluster: Cluster of this session
     :param session: Session
     """
+    # Special KEYSPACE query
     query_create_keyspace = ('CREATE KEYSPACE {} WITH REPLICATION =' +
                              ' {{ {} : {}, {} : {} }};').format(
         key_space, "'class'", "'SimpleStrategy'",
@@ -98,31 +99,16 @@ Set sdn namespace to current namespace. If namespace does not exist -> create
     # Keyspaces
     keyspaces = cluster.metadata.keyspaces
     if key_space in keyspaces:
-        print 'Keyspace found {0}'.format(key_space)
+        print_info( 'Keyspace found {0}'.format(key_space))
     else:
-        print(query_create_keyspace)
+        print_info(query_create_keyspace)
         session.execute(query_create_keyspace)
     session.set_keyspace(key_space)
 
 
-def prepare_queries(session, query_by_name, table_name):
-    # Queries for creation and drop
+def print_info(info):
     """
-
-    :param session:
-    :param query_by_name:
-    :param table_name:
+Formatted Print so state messages can be separated from other messages
+    :param info:
     """
-    query_by_name.setdefault('create_table', {})
-    query_by_name['create_table'] = session.prepare(
-        "CREATE TABLE " + table_name +
-        " (" + "dict" + " VARCHAR PRIMARY KEY);")
-    query_by_name.setdefault('delete_table', {})
-    query_by_name['delete_table'] = session.prepare("DROP TABLE " + table_name + ";")
-
-# Test and Debug area
-# mystate = VState()
-# res = mystate.get_dict(1)
-# res['a'] = 'b'
-# mystate.update_dict(1, res)
-# res = mystate.get_dict(1)
+    print "[VSTATE]: " + str(info)

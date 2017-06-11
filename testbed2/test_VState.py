@@ -7,10 +7,10 @@ class TestVState(TestCase):
         import cassandra_vstate as vs
         state = vs.VState()
         my_dict = state.get_dict(1)
-        my_dict['3'] = '2'
+        my_dict['00:00:00:00:00:00'] = 2
         state.update_dict(1, my_dict)
         my_dict = state.get_dict(1)
-        self.assertDictContainsSubset({'3': '2'}, my_dict)
+        self.assertDictContainsSubset({'00:00:00:00:00:00': 2}, my_dict)
 
 
 # Running Tests
