@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+"""
+Starts RYU controller from code.
+Used for debugging
+"""
+
 import sys
 from ryu.cmd import manager
 
